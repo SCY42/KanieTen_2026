@@ -2,8 +2,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 
-// import Nearby from "nearby-js/Nearby.js";
 
+// ╔══════════════════════════════════════════════════════════════════════╗ //
+// ║                                초기화                                ║ //
+// ╚══════════════════════════════════════════════════════════════════════╝ //
 
 // 장면 초기화
 const scene = new THREE.Scene();
@@ -31,9 +33,9 @@ document.addEventListener( "click", () => {
 } );
 
 
-// // Nearby 초기화
-// let nearby = new Nearby( 1000, 1000, 1000, 10 );
-
+// ╔══════════════════════════════════════════════════════════════════════╗ //
+// ║                                 콜백                                 ║ //
+// ╚══════════════════════════════════════════════════════════════════════╝ //
 
 // 움직임 오브젝트
 const movement = {
@@ -69,7 +71,6 @@ document.addEventListener('keyup', (event) => {
     }
 });
 
-
 // 창 크기 변경 콜백
 const onWindowResize = function () {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -79,20 +80,20 @@ const onWindowResize = function () {
 }; window.addEventListener( "resize", onWindowResize, false );
 
 
+// ╔══════════════════════════════════════════════════════════════════════╗ //
+// ║                              glft 로드                               ║ //
+// ╚══════════════════════════════════════════════════════════════════════╝ //
+
 // glft 로딩 매니저
 const loadingManager = new THREE.LoadingManager();
 loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
     console.log(`${itemsLoaded}/${itemsTotal}`);
 }
 
-const lightGroup = new THREE.Group();
-
-// glft 로드
 const loader = new GLTFLoader( loadingManager );
 loader.load( "scene.gltf", function ( gltf ) {
     const model = gltf.scene;
 
-    // 모델 깊이 관련 문제 해결
     model.traverse( ( child ) => {
         if ( child.isMesh ) {
             child.receiveShadow = true;
@@ -112,22 +113,6 @@ loader.load( "scene.gltf", function ( gltf ) {
             spotLight.castShadow = false;
             spotLight.penumbra = 0.5;
             spotLight.angle = Math.min( Math.PI / 2, artSize / 5 );
-
-            // spotLight.shadow.camera.near = 0;
-            // spotLight.shadow.camera.far = 5;
-            // spotLight.shadow.camera.left = -5;
-            // spotLight.shadow.camera.right = 5;
-            // spotLight.shadow.camera.top = 5;
-            // spotLight.shadow.camera.bottom = -5;
-
-            // let box = nearby.createBox( spotLight.position.x, spotLight.position.y, spotLight.position.z, 1, 1, 1 );
-            // let obj = nearby.createObject( number + "_lightBox", box )
-            // nearby.insert( obj );
-            
-            // scene.add( spotLight );
-            // console.log( `added spotlight ${ child.name.slice( 0, 3 ) }` );
-            // scene.add( new THREE.SpotLightHelper( spotLight ) );
-            lightGroup.add( spotLight );
         }
     });
 
@@ -141,7 +126,10 @@ loader.load( "scene.gltf", function ( gltf ) {
 } );
 
 
-// 초기 렌더
+// ╔══════════════════════════════════════════════════════════════════════╗ //
+// ║                              방향광 추가                             ║ //
+// ╚══════════════════════════════════════════════════════════════════════╝ //
+
 // const light = new THREE.AmbientLight( 0xffffff, 0.75 );
 // scene.add(light);
 const dirLight = new THREE.DirectionalLight( 0x87CEFA, 3 );
@@ -164,13 +152,13 @@ scene.add( dirLightTarget );
 dirLight.target = dirLightTarget;
 scene.add( dirLight );
 
-// 컨트롤러 관련 파라미터
+
+// ╔══════════════════════════════════════════════════════════════════════╗ //
+// ║                            매 프레임 렌더                            ║ //
+// ╚══════════════════════════════════════════════════════════════════════╝ //
+
 const SPEED = 0.5;
 
-
-// let nearbyResult;
-
-// 매 프레임
 function animate() {
     requestAnimationFrame(animate);
 
@@ -181,22 +169,6 @@ function animate() {
     if (movement.up)       camera.position.add(new THREE.Vector3(0, SPEED, 0));
     if (movement.down)     camera.position.add(new THREE.Vector3(0, -SPEED, 0));
 
-    // console.log( camera.position.distanceTo( lights[0].position ) );
-    // for ( let i = 0; i < lights.length; i++ ) {
-    //     if ( camera.position.distanceTo( lights[i].position ) <= 30 ) {
-    //         lights[i].castShadow = true;
-    //     } else {
-    //         lights[i].castShadow = false;
-    //     }
-    // }
-
-    // nearbyResult = nearby.query( camera.position.x, camera.position.y, camera.position.z );
-    // for ( let obj of nearbyResult.keys() ) {
-    //     const light = scene.getObjectByName( obj.id.slice( 0, 3 ) + "_light" );
-    //     light.castShadow = true;
-    // }
-
-    // controls.update();
     camera.updateProjectionMatrix();
     renderer.render(scene, camera);
 } animate();
