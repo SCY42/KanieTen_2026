@@ -26,6 +26,16 @@ const cameraBox = new THREE.BoxGeometry( 0.5, 1.5, 0.5 );
 camera.position.set( 0, 1.3, 0 );
 
 
+// 레이캐스터 초기화
+const rayCaster = new THREE.Raycaster();
+const down = new THREE.Vector3( 0, -1, 0 );
+
+// 레이캐스터 헬퍼
+const arrowHelper = new THREE.ArrowHelper( rayCaster.direction, rayCaster.origin, 10, 0xff0000 );
+// rayCaster.attach( arrowHelper );
+scene.add( arrowHelper );
+
+
 // 컨트롤 초기화
 const controls = new PointerLockControls( camera, renderer.domElement );
 document.addEventListener( "click", () => {
@@ -90,6 +100,9 @@ loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
     console.log(`${itemsLoaded}/${itemsTotal}`);
 }
 
+// 레이캐스터 테스트용 박스
+const testBox = new THREE.Box3();
+
 const loader = new GLTFLoader( loadingManager );
 loader.load( "scene.gltf", function ( gltf ) {
     const model = gltf.scene;
@@ -98,6 +111,7 @@ loader.load( "scene.gltf", function ( gltf ) {
         if ( child.isMesh ) {
             child.receiveShadow = true;
             child.castShadow = true;
+            console.log( child.name );
         }
 
         if ( child.name.endsWith( "_lightPosObj" ) ) {
@@ -113,14 +127,19 @@ loader.load( "scene.gltf", function ( gltf ) {
             spotLight.castShadow = false;
             spotLight.penumbra = 0.5;
             spotLight.angle = Math.min( Math.PI / 2, artSize / 5 );
+            scene.add( spotLight );
         }
     });
 
     // model.scale.set( 0.1, 0.1, 0.1 );
     model.position.set( 0, 0, 0 );
     scene.add( model );
-    scene.add( lightGroup );
-    // scene.add( new THREE.AxesHelper( 10 ) );
+    
+    testBox.expandByObject( scene.getObjectByName( "Cube" ) );
+    const testBoxHelper = new THREE.Box3Helper( testBox );
+    // scene.add( testBox );
+    scene.add( testBoxHelper );
+
 }, undefined, function ( error ) {
     console.error( error );
 } );
@@ -158,9 +177,24 @@ scene.add( dirLight );
 // ╚══════════════════════════════════════════════════════════════════════╝ //
 
 const SPEED = 0.5;
+const result = new THREE.Vector3()
+let distance;
+const HEIGHT = 6.5;
 
-function animate() {
-    requestAnimationFrame(animate);
+
+// 카메라 위치 업데이트
+function updateCamera() {
+    rayCaster.set( camera.position, down );
+    rayCaster.ray.intersectBox( testBox, result );
+    distance = camera.position.y - result.y;
+    console.log( distance );
+    camera.position.setY( result.y + HEIGHT );
+}
+
+
+// 애니메이팅
+function render() {
+    requestAnimationFrame(render);
 
     if (movement.forward)  controls.moveForward(SPEED);
     if (movement.backward) controls.moveForward(-SPEED);
@@ -169,6 +203,8 @@ function animate() {
     if (movement.up)       camera.position.add(new THREE.Vector3(0, SPEED, 0));
     if (movement.down)     camera.position.add(new THREE.Vector3(0, -SPEED, 0));
 
+    updateCamera();
+
     camera.updateProjectionMatrix();
     renderer.render(scene, camera);
-} animate();
+} render();
