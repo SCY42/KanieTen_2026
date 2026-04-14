@@ -30,11 +30,6 @@ camera.position.set( 0, 1.3, 0 );
 const rayCaster = new THREE.Raycaster();
 const down = new THREE.Vector3( 0, -1, 0 );
 
-// 레이캐스터 헬퍼
-const arrowHelper = new THREE.ArrowHelper( rayCaster.direction, rayCaster.origin, 10, 0xff0000 );
-// rayCaster.attach( arrowHelper );
-scene.add( arrowHelper );
-
 
 // 컨트롤 초기화
 const controls = new PointerLockControls( camera, renderer.domElement );
@@ -103,6 +98,9 @@ loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
 // 레이캐스터 테스트용 박스
 const testBox = new THREE.Box3();
 
+// 땅 위에 있는 지형
+const objects = [];
+
 const loader = new GLTFLoader( loadingManager );
 loader.load( "scene.gltf", function ( gltf ) {
     const model = gltf.scene;
@@ -130,6 +128,19 @@ loader.load( "scene.gltf", function ( gltf ) {
             scene.add( spotLight );
         }
     });
+
+    const stair_plane_high = model.getObjectByName( "stair_plane_high" );
+    const stair_plane_med = model.getObjectByName( "stair_plane_med" );
+    const stair_plane_low = model.getObjectByName( "stair_plane_low" );
+    const second_floor_plane = model.getObjectByName( "second_floor_plane" );
+
+    stair_plane_high.visible = false;
+    stair_plane_high.material.side = THREE.DoubleSide;
+    stair_plane_med.visible = false;
+    stair_plane_low.visible = false;
+    second_floor_plane.visible = false;
+
+    objects.push( stair_plane_high, stair_plane_med, stair_plane_low, second_floor_plane );
 
     // model.scale.set( 0.1, 0.1, 0.1 );
     model.position.set( 0, 0, 0 );
@@ -177,18 +188,26 @@ scene.add( dirLight );
 // ╚══════════════════════════════════════════════════════════════════════╝ //
 
 const SPEED = 0.5;
-const result = new THREE.Vector3()
-let distance;
+let result;
 const HEIGHT = 6.5;
+const GROUND = -16.6 + HEIGHT;
+const HEIGHT_VARIANCE = 2.0;
+const a = new THREE.Vector3( 0, 0, 0 );
 
 
 // 카메라 위치 업데이트
 function updateCamera() {
     rayCaster.set( camera.position, down );
-    rayCaster.ray.intersectBox( testBox, result );
-    distance = camera.position.y - result.y;
-    console.log( distance );
-    camera.position.setY( result.y + HEIGHT );
+    result = rayCaster.intersectObjects( objects );
+    
+    if ( result[0] == null ) {
+        camera.position.y = GROUND;
+    } else {
+        camera.position.y = result[0].point.y + HEIGHT;
+    }
+
+    if (movement.up)       camera.position.y += HEIGHT_VARIANCE;
+    if (movement.down)     camera.position.y -= HEIGHT_VARIANCE;
 }
 
 
@@ -200,8 +219,6 @@ function render() {
     if (movement.backward) controls.moveForward(-SPEED);
     if (movement.left)     controls.moveRight(-SPEED);
     if (movement.right)    controls.moveRight(SPEED);
-    if (movement.up)       camera.position.add(new THREE.Vector3(0, SPEED, 0));
-    if (movement.down)     camera.position.add(new THREE.Vector3(0, -SPEED, 0));
 
     updateCamera();
 
