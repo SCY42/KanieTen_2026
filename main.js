@@ -84,15 +84,28 @@ const onWindowResize = function () {
     renderer.render( scene, camera );
 }; window.addEventListener( "resize", onWindowResize, false );
 
+const pauseScreen = document.getElementById( "pauseScreen" );
+
+// 포커스 해제 콜백
+controls.addEventListener( "unlock", function() {
+    pauseScreen.style.visibility = "visible";
+} );
+
+// 포커스 콜백
+controls.addEventListener( "lock", function() {
+    pauseScreen.style.visibility = "hidden";
+} );
 
 // ╔══════════════════════════════════════════════════════════════════════╗ //
 // ║                              glft 로드                               ║ //
 // ╚══════════════════════════════════════════════════════════════════════╝ //
 
 // glft 로딩 매니저
+const loadingProgress = document.getElementById( "loadingProgress" );
 const loadingManager = new THREE.LoadingManager();
 loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
-    console.log(`${itemsLoaded}/${itemsTotal}`);
+    // console.log(`${itemsLoaded}/${itemsTotal}`);
+    loadingProgress.textContent = `Loading Resource… ${itemsLoaded}/${itemsTotal}`;
 }
 
 // 레이캐스터 테스트용 박스
@@ -109,7 +122,7 @@ loader.load( "scene.gltf", function ( gltf ) {
         if ( child.isMesh ) {
             child.receiveShadow = true;
             child.castShadow = true;
-            console.log( child.name );
+            // console.log( child.name );
         }
 
         if ( child.name.endsWith( "_lightPosObj" ) ) {
