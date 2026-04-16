@@ -61,7 +61,7 @@ document.addEventListener('keydown', (event) => {
       case 'KeyD': movement.right    = true; break;
       case 'Space': movement.up = true; break;
       case 'ControlLeft': movement.down = true; break;
-    }
+    } requestRender();
 });
 
 // 조작 키 업 콜백
@@ -73,7 +73,7 @@ document.addEventListener('keyup', (event) => {
       case 'KeyD': movement.right       = false; break;
       case 'Space': movement.up         = false; break;
       case 'ControlLeft': movement.down = false; break;
-    }
+    } requestRender();
 });
 
 // 창 크기 변경 콜백
