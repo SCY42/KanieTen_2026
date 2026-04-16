@@ -88,15 +88,29 @@ const onWindowResize = function () {
 // 카메라 시점 조작 콜백
 controls.addEventListener( "change", requestRender );
 
+const pauseScreen = document.getElementById( "pauseScreen" );
+
+// 포커스 해제 콜백
+controls.addEventListener( "unlock", function() {
+    pauseScreen.style.visibility = "visible";
+} );
+
+// 포커스 콜백
+controls.addEventListener( "lock", function() {
+    pauseScreen.style.visibility = "hidden";
+} );
 
 // ╔══════════════════════════════════════════════════════════════════════╗ //
 // ║                              glft 로드                               ║ //
 // ╚══════════════════════════════════════════════════════════════════════╝ //
 
 // glft 로딩 매니저
+const loadingProgress = document.getElementById( "loadingProgress" );
 const loadingManager = new THREE.LoadingManager();
 loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
-    console.log(`${itemsLoaded}/${itemsTotal}`);
+    const TOTAL = 40;
+    const filled = Math.round( TOTAL * ( itemsLoaded / itemsTotal ) );
+    loadingProgress.textContent = '█'.repeat(filled) + '▒'.repeat( TOTAL - filled );
 }
 
 // 땅 위에 있는 지형
@@ -110,7 +124,7 @@ loader.load( "scene.gltf", function ( gltf ) {
         if ( child.isMesh ) {
             child.receiveShadow = true;
             child.castShadow = true;
-            console.log( child.name );
+            // console.log( child.name );
         }
 
         if ( child.name.endsWith( "_lightPosObj" ) ) {
