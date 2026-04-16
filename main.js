@@ -82,7 +82,11 @@ const onWindowResize = function () {
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.render( scene, camera );
+    requestRender();
 }; window.addEventListener( "resize", onWindowResize, false );
+
+// 카메라 시점 조작 콜백
+controls.addEventListener( "change", requestRender );
 
 
 // ╔══════════════════════════════════════════════════════════════════════╗ //
@@ -94,9 +98,6 @@ const loadingManager = new THREE.LoadingManager();
 loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
     console.log(`${itemsLoaded}/${itemsTotal}`);
 }
-
-// 레이캐스터 테스트용 박스
-const testBox = new THREE.Box3();
 
 // 땅 위에 있는 지형
 const objects = [];
@@ -142,14 +143,8 @@ loader.load( "scene.gltf", function ( gltf ) {
 
     objects.push( stair_plane_high, stair_plane_med, stair_plane_low, second_floor_plane );
 
-    // model.scale.set( 0.1, 0.1, 0.1 );
     model.position.set( 0, 0, 0 );
     scene.add( model );
-    
-    testBox.expandByObject( scene.getObjectByName( "Cube" ) );
-    const testBoxHelper = new THREE.Box3Helper( testBox );
-    // scene.add( testBox );
-    scene.add( testBoxHelper );
 
 }, undefined, function ( error ) {
     console.error( error );
@@ -192,13 +187,26 @@ let result;
 const HEIGHT = 6.5;
 const GROUND = -16.6 + HEIGHT;
 const HEIGHT_VARIANCE = 2.0;
-const a = new THREE.Vector3( 0, 0, 0 );
+let needsRender = true;
 
+// 움직임 여부 판정
+function isMoving() {
+    return Object.values( movement ).some( v => v );
+}
+
+setInterval( () => {
+    if ( isMoving() ) requestRender();
+}, 16.6 );
 
 // 카메라 위치 업데이트
 function updateCamera() {
     rayCaster.set( camera.position, down );
     result = rayCaster.intersectObjects( objects );
+    
+    if (movement.forward)  controls.moveForward(SPEED);
+    if (movement.backward) controls.moveForward(-SPEED);
+    if (movement.left)     controls.moveRight(-SPEED);
+    if (movement.right)    controls.moveRight(SPEED);
     
     if ( result[0] == null ) {
         camera.position.y = GROUND;
@@ -211,17 +219,20 @@ function updateCamera() {
 }
 
 
+function requestRender() {
+    needsRender = true;
+    requestAnimationFrame( render );
+}
+
+
 // 애니메이팅
 function render() {
-    requestAnimationFrame(render);
-
-    if (movement.forward)  controls.moveForward(SPEED);
-    if (movement.backward) controls.moveForward(-SPEED);
-    if (movement.left)     controls.moveRight(-SPEED);
-    if (movement.right)    controls.moveRight(SPEED);
-
+    // requestAnimationFrame(render);
+    if ( !needsRender ) { return; }
+    
+    needsRender = false;
     updateCamera();
-
     camera.updateProjectionMatrix();
     renderer.render(scene, camera);
+    console.log( "now rendering!" );
 } render();
