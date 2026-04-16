@@ -22,7 +22,6 @@ document.body.appendChild( renderer.domElement );
 
 // 카메라 초기화
 const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 500 );
-const cameraBox = new THREE.BoxGeometry( 0.5, 1.5, 0.5 );
 camera.position.set( 0, 1.3, 0 );
 
 
@@ -33,6 +32,7 @@ const down = new THREE.Vector3( 0, -1, 0 );
 
 // 컨트롤 초기화
 const controls = new PointerLockControls( camera, renderer.domElement );
+controls.pointerSpeed = 0.75;
 document.addEventListener( "click", () => {
     controls.lock();
 } );
@@ -53,28 +53,32 @@ const movement = {
 }
 
 // 조작 키 다운 콜백
-document.addEventListener('keydown', (event) => {
-    switch (event.code) {
-      case 'KeyW': movement.forward  = true; break;
-      case 'KeyS': movement.backward = true; break;
-      case 'KeyA': movement.left     = true; break;
-      case 'KeyD': movement.right    = true; break;
-      case 'Space': movement.up = true; break;
+document.addEventListener( 'keydown', (e) => {
+    switch (e.code) {
+      case 'KeyW': movement.forward     = true; break;
+      case 'KeyS': movement.backward    = true; break;
+      case 'KeyA': movement.left        = true; break;
+      case 'KeyD': movement.right       = true; break;
+      case 'Space': movement.up         = true; break;
       case 'ControlLeft': movement.down = true; break;
+
+      case 'KeyE': zoomIn(); break;
     } requestRender();
-});
+} );
 
 // 조작 키 업 콜백
-document.addEventListener('keyup', (event) => {
-    switch (event.code) {
+document.addEventListener( 'keyup', (e) => {
+    switch (e.code) {
       case 'KeyW': movement.forward     = false; break;
       case 'KeyS': movement.backward    = false; break;
       case 'KeyA': movement.left        = false; break;
       case 'KeyD': movement.right       = false; break;
       case 'Space': movement.up         = false; break;
       case 'ControlLeft': movement.down = false; break;
+      
+      case 'KeyE': zoomOut(); break;
     } requestRender();
-});
+} );
 
 // 창 크기 변경 콜백
 const onWindowResize = function () {
@@ -99,6 +103,32 @@ controls.addEventListener( "unlock", function() {
 controls.addEventListener( "lock", function() {
     pauseScreen.style.visibility = "hidden";
 } );
+
+// ╔════════════════════════════════════════════════════════════════════════╗ //
+// ║                             함수 이것저것                              ║ //
+// ╚════════════════════════════════════════════════════════════════════════╝ //
+
+// 움직임 여부 판정
+function isMoving() {
+    return Object.values( movement ).some( v => v );
+}
+
+// 매 프레임 움직임 여부 판정
+setInterval( () => {
+    if ( isMoving() ) requestRender();
+}, 16.6 );
+
+// 줌 인
+function zoomIn() {
+    camera.zoom = 2;
+    controls.pointerSpeed = 0.25;
+}
+
+// 줌 아웃
+function zoomOut() {
+    camera.zoom = 1;
+    controls.pointerSpeed = 0.75;
+}
 
 // ╔══════════════════════════════════════════════════════════════════════╗ //
 // ║                              glft 로드                               ║ //
@@ -160,6 +190,8 @@ loader.load( "scene.gltf", function ( gltf ) {
     model.position.set( 0, 0, 0 );
     scene.add( model );
 
+    requestRender();
+
 }, undefined, function ( error ) {
     console.error( error );
 } );
@@ -203,15 +235,6 @@ const GROUND = -16.6 + HEIGHT;
 const HEIGHT_VARIANCE = 2.0;
 let needsRender = true;
 
-// 움직임 여부 판정
-function isMoving() {
-    return Object.values( movement ).some( v => v );
-}
-
-setInterval( () => {
-    if ( isMoving() ) requestRender();
-}, 16.6 );
-
 // 카메라 위치 업데이트
 function updateCamera() {
     rayCaster.set( camera.position, down );
@@ -242,7 +265,7 @@ function requestRender() {
 // 애니메이팅
 function render() {
     // requestAnimationFrame(render);
-    if ( !needsRender ) { return; }
+    if ( !needsRender ) return;
     
     needsRender = false;
     updateCamera();
