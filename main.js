@@ -104,8 +104,9 @@ controls.addEventListener( "lock", function() {
 const loadingProgress = document.getElementById( "loadingProgress" );
 const loadingManager = new THREE.LoadingManager();
 loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
-    // console.log(`${itemsLoaded}/${itemsTotal}`);
-    loadingProgress.textContent = `Loading Resource… ${itemsLoaded}/${itemsTotal}`;
+    const TOTAL = 40;
+    const filled = Math.round( TOTAL * ( itemsLoaded / itemsTotal ) );
+    loadingProgress.textContent = '█'.repeat(filled) + '▒'.repeat( TOTAL - filled );
 }
 
 // 레이캐스터 테스트용 박스
