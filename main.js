@@ -8,6 +8,7 @@ import { StaticGeometryGenerator, MeshBVH } from 'three-mesh-bvh';
 // ║                                초기화                                ║ //
 // ╚══════════════════════════════════════════════════════════════════════╝ //
 
+
 // 장면 초기화
 const scene = new THREE.Scene();
 scene.background = new THREE.Color( 0xBDE3FA );
@@ -31,6 +32,7 @@ const RADIUS = 3;
 let collider;
 
 
+// 임시 오브젝트들 (충돌 판정용)
 const tempBox = new THREE.Box3();
 const tempVector = new THREE.Vector3();
 const tempVector2 = new THREE.Vector3();
@@ -44,7 +46,7 @@ const down = new THREE.Vector3( 0, -1, 0 );
 
 // 컨트롤 초기화
 const controls = new PointerLockControls( camera, renderer.domElement );
-controls.pointerSpeed = 0.75;
+controls.pointerSpeed = 0.5;
 document.addEventListener( "click", () => {
     controls.lock();
 } );
@@ -53,6 +55,7 @@ document.addEventListener( "click", () => {
 // ╔══════════════════════════════════════════════════════════════════════╗ //
 // ║                                 콜백                                 ║ //
 // ╚══════════════════════════════════════════════════════════════════════╝ //
+
 
 // 움직임 오브젝트
 const movement = {
@@ -116,9 +119,11 @@ controls.addEventListener( "lock", function() {
     pauseScreen.style.visibility = "hidden";
 } );
 
+
 // ╔════════════════════════════════════════════════════════════════════════╗ //
 // ║                             함수 이것저것                              ║ //
 // ╚════════════════════════════════════════════════════════════════════════╝ //
+
 
 // 움직임 여부 판정
 function isMoving() {
@@ -133,18 +138,20 @@ setInterval( () => {
 // 줌 인
 function zoomIn() {
     camera.zoom = 2;
-    controls.pointerSpeed = 0.25;
+    controls.pointerSpeed = 0.1;
 }
 
 // 줌 아웃
 function zoomOut() {
     camera.zoom = 1;
-    controls.pointerSpeed = 0.75;
+    controls.pointerSpeed = 0.5;
 }
+
 
 // ╔══════════════════════════════════════════════════════════════════════╗ //
 // ║                              glft 로드                               ║ //
 // ╚══════════════════════════════════════════════════════════════════════╝ //
+
 
 // glft 로딩 매니저
 const loadingProgress = document.getElementById( "loadingProgress" );
@@ -155,20 +162,23 @@ loadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
     loadingProgress.textContent = '█'.repeat(filled) + '▒'.repeat( TOTAL - filled );
 }
 
-// 땅 위에 있는 지형
-const objects = [];
+// 땅 위에 있는 바닥들
+const floors = [];
 
+// GLTF 로드
 const loader = new GLTFLoader( loadingManager );
 loader.load( "scene.gltf", function ( gltf ) {
     const model = gltf.scene;
 
     model.traverse( ( child ) => {
+        // 메쉬 그림자 활성화
         if ( child.isMesh ) {
             child.receiveShadow = true;
             child.castShadow = true;
-            console.log( child.name );
+            // console.log( child.name );
         }
 
+        // 지정된 위치에 조명 배치
         if ( child.name.endsWith( "_lightPosObj" ) ) {
             const spotLight = new THREE.SpotLight( 0xffffff );
             spotLight.position.set( child.position.x, child.position.y, child.position.z );
@@ -189,10 +199,11 @@ loader.load( "scene.gltf", function ( gltf ) {
     // BVH 생성
     const gen = new StaticGeometryGenerator( gltf.scene );
     const geom = gen.generate();
-    geom.boundsTree = new MeshBVH(geom);
+    geom.boundsTree = new MeshBVH( geom );
 
-    collider = new THREE.Mesh(geom);
+    collider = new THREE.Mesh( geom );
 
+    // 보조 메쉬가 안 보이도록 설정
     const stair_plane_high = model.getObjectByName( "stair_plane_high" );
     const stair_plane_med = model.getObjectByName( "stair_plane_med" );
     const stair_plane_low = model.getObjectByName( "stair_plane_low" );
@@ -213,7 +224,8 @@ loader.load( "scene.gltf", function ( gltf ) {
     wall_004.visible = false;
     wall_005.visible = false;
 
-    objects.push( stair_plane_high, stair_plane_med, stair_plane_low, second_floor_plane );
+    // 바닥 메쉬를 배열에 추가
+    floors.push( stair_plane_high, stair_plane_med, stair_plane_low, second_floor_plane );
 
     model.position.set( 0, 0, 0 );
     scene.add( model );
@@ -229,7 +241,8 @@ loader.load( "scene.gltf", function ( gltf ) {
 // ║                              방향광 추가                             ║ //
 // ╚══════════════════════════════════════════════════════════════════════╝ //
 
-// const light = new THREE.AmbientLight( 0xffffff, 0.75 );
+
+const light = new THREE.AmbientLight( 0xffffff, 0.25 );
 // scene.add(light);
 const dirLight = new THREE.DirectionalLight( 0x87CEFA, 3 );
 dirLight.shadow.normalBias = 1;
@@ -256,6 +269,7 @@ scene.add( dirLight );
 // ║                            매 프레임 렌더                            ║ //
 // ╚══════════════════════════════════════════════════════════════════════╝ //
 
+
 const SPEED = 0.5;
 let result;
 const HEIGHT = 6.5;
@@ -263,10 +277,11 @@ const GROUND = -16.6 + HEIGHT;
 const HEIGHT_VARIANCE = 2.0;
 let needsRender = true;
 
+
 // 카메라 위치 업데이트
 function updateCamera() {
     rayCaster.set( camera.position, down );
-    result = rayCaster.intersectObjects( objects );
+    result = rayCaster.intersectObjects( floors );
     
     if (movement.forward)  controls.moveForward(SPEED);
     if (movement.backward) controls.moveForward(-SPEED);
@@ -284,6 +299,7 @@ function updateCamera() {
 }
 
 
+// 충돌 처리 (ChatGPT)
 function resolveCollision() {
     if (!collider) return;
   
@@ -324,6 +340,7 @@ function resolveCollision() {
   }
 
 
+// 렌더링 리퀘스트
 function requestRender() {
     needsRender = true;
     requestAnimationFrame( render );
