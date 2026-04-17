@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
+import { StaticGeometryGenerator, MeshBVH } from 'three-mesh-bvh';
 
 
 // ╔══════════════════════════════════════════════════════════════════════╗ //
@@ -22,7 +23,18 @@ document.body.appendChild( renderer.domElement );
 
 // 카메라 초기화
 const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 500 );
-camera.position.set( 0, 1.3, 0 );
+camera.position.set( -11, -10, 10 );
+
+
+// 카메라 충돌체 초기화
+const RADIUS = 3;
+let collider;
+
+
+const tempBox = new THREE.Box3();
+const tempVector = new THREE.Vector3();
+const tempVector2 = new THREE.Vector3();
+const tempMat = new THREE.Matrix4();
 
 
 // 레이캐스터 초기화
@@ -174,6 +186,13 @@ loader.load( "scene.gltf", function ( gltf ) {
         }
     });
 
+    // BVH 생성
+    const gen = new StaticGeometryGenerator( gltf.scene );
+    const geom = gen.generate();
+    geom.boundsTree = new MeshBVH(geom);
+
+    collider = new THREE.Mesh(geom);
+
     const stair_plane_high = model.getObjectByName( "stair_plane_high" );
     const stair_plane_med = model.getObjectByName( "stair_plane_med" );
     const stair_plane_low = model.getObjectByName( "stair_plane_low" );
@@ -256,6 +275,46 @@ function updateCamera() {
 }
 
 
+function resolveCollision() {
+    if (!collider) return;
+  
+    // 로컬 변환
+    tempMat.copy(collider.matrixWorld).invert();
+    const localPos = tempVector.applyMatrix4.call(
+      tempVector.copy(camera.position),
+      tempMat
+    );
+  
+    // AABB
+    tempBox.min.copy(localPos).addScalar( -RADIUS );
+    tempBox.max.copy(localPos).addScalar( RADIUS );
+  
+    collider.geometry.boundsTree.shapecast({
+  
+      intersectsBounds: box => box.intersectsBox(tempBox),
+  
+      intersectsTriangle: tri => {
+  
+        const closest = tempVector2;
+        tri.closestPointToPoint(localPos, closest);
+  
+        const dist = closest.distanceTo(localPos);
+  
+        if (dist < RADIUS) {
+  
+          const depth = RADIUS - dist;
+          const dir = localPos.clone().sub(closest).normalize();
+  
+          localPos.addScaledVector(dir, depth);
+        }
+      }
+    });
+  
+    // 월드 복귀
+    camera.position.copy(localPos.applyMatrix4(collider.matrixWorld));
+  }
+
+
 function requestRender() {
     needsRender = true;
     requestAnimationFrame( render );
@@ -269,7 +328,9 @@ function render() {
     
     needsRender = false;
     updateCamera();
+    resolveCollision();
     camera.updateProjectionMatrix();
     renderer.render(scene, camera);
     console.log( "now rendering!" );
+    // console.log( camera.position );
 } render();
