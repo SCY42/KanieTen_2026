@@ -166,7 +166,7 @@ loader.load( "scene.gltf", function ( gltf ) {
         if ( child.isMesh ) {
             child.receiveShadow = true;
             child.castShadow = true;
-            // console.log( child.name );
+            console.log( child.name );
         }
 
         if ( child.name.endsWith( "_lightPosObj" ) ) {
@@ -197,12 +197,21 @@ loader.load( "scene.gltf", function ( gltf ) {
     const stair_plane_med = model.getObjectByName( "stair_plane_med" );
     const stair_plane_low = model.getObjectByName( "stair_plane_low" );
     const second_floor_plane = model.getObjectByName( "second_floor_plane" );
+    const wall_001 = model.getObjectByName( "wall_001" );
+    const wall_002 = model.getObjectByName( "wall_002" );
+    const wall_003 = model.getObjectByName( "wall_003" );
+    const wall_004 = model.getObjectByName( "wall_004" );
+    const wall_005 = model.getObjectByName( "wall_005" );
 
     stair_plane_high.visible = false;
-    stair_plane_high.material.side = THREE.DoubleSide;
     stair_plane_med.visible = false;
     stair_plane_low.visible = false;
     second_floor_plane.visible = false;
+    wall_001.visible = false;
+    wall_002.visible = false;
+    wall_003.visible = false;
+    wall_004.visible = false;
+    wall_005.visible = false;
 
     objects.push( stair_plane_high, stair_plane_med, stair_plane_low, second_floor_plane );
 
