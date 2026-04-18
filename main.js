@@ -11,7 +11,16 @@ import { StaticGeometryGenerator, MeshBVH } from 'three-mesh-bvh';
 
 // 장면 초기화
 const scene = new THREE.Scene();
-scene.background = new THREE.Color( 0xBDE3FA );
+const textureCube = new THREE.CubeTextureLoader()
+    .setPath( "cube/" )
+    .load(
+        [ 'east.bmp', 'west.bmp', 'up.bmp', 'down.bmp', 'north.bmp', 'south.bmp' ],
+        ( texture ) => {
+            scene.background = texture;
+        }
+    );
+textureCube.mapping = THREE.CubeRefractionMapping;
+// scene.background = new THREE.Color( 0xBDE3FA );
 scene.fog = new THREE.Fog( 0xcccccc, 10, 150 );
 
 
@@ -188,7 +197,7 @@ loader.load( "scene.gltf", function ( gltf ) {
             const artSize = Math.max( ...new THREE.Box3().setFromObject( art ).getSize( new THREE.Vector3() ) );
             spotLight.name = number + '_light';
             spotLight.target = art
-            spotLight.intensity = 50;
+            spotLight.intensity = 75;
             spotLight.castShadow = false;
             spotLight.penumbra = 0.5;
             spotLight.angle = Math.min( Math.PI / 2, artSize / 5 );
@@ -244,7 +253,7 @@ loader.load( "scene.gltf", function ( gltf ) {
 
 const light = new THREE.AmbientLight( 0xffffff, 0.25 );
 // scene.add(light);
-const dirLight = new THREE.DirectionalLight( 0x87CEFA, 3 );
+const dirLight = new THREE.DirectionalLight( 0xffffff, 2 );
 dirLight.shadow.normalBias = 1;
 dirLight.shadow.radius = 5;
 dirLight.castShadow = true;
