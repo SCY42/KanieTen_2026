@@ -13,7 +13,6 @@ https://x.com/MeTyaYuRusu
 ### BGM
 
 ゆめにっき OST - バラック集落
-https://yumenikki.fandom.com/wiki/Soundtrack
 
 ### 3D Model
 
