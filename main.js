@@ -275,9 +275,9 @@ loader.load( "scene.gltf", function ( gltf ) {
 // ╚══════════════════════════════════════════════════════════════════════╝ //
 
 
-const light = new THREE.AmbientLight( 0xffffff, 0.25 );
-// scene.add(light);
-const dirLight = new THREE.DirectionalLight( 0xffffff, 2 );
+const light = new THREE.AmbientLight( 0xCEB267, 0.1 );
+scene.add(light);
+const dirLight = new THREE.DirectionalLight( 0xAEC8D9, 2 );
 dirLight.shadow.normalBias = 1;
 dirLight.shadow.radius = 5;
 dirLight.castShadow = true;
