@@ -104,6 +104,27 @@ document.addEventListener( 'keyup', (e) => {
     } requestRender();
 } );
 
+// bgm 오브젝트
+const bgm = document.getElementById( "bgm" );
+const bgm_on = document.getElementById( "bgm_on" );
+const bgm_off = document.getElementById( "bgm_off" );
+
+// bgm 재생 / 정지 키 콜백
+document.addEventListener( "keydown", (e) => {
+    if ( e.code != "KeyM" ) return;
+
+    if ( bgm.paused ) {
+        bgm.play();
+        bgm_on.style.visibility = "visible";
+        bgm_off.style.visibility = "hidden";
+    }
+    else {
+        bgm.pause();
+        bgm_on.style.visibility = "hidden";
+        bgm_off.style.visibility = "visible";
+    }
+} )
+
 // 창 크기 변경 콜백
 const onWindowResize = function () {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -120,12 +141,12 @@ const pauseScreen = document.getElementById( "pauseScreen" );
 
 // 포커스 해제 콜백
 controls.addEventListener( "unlock", function() {
-    pauseScreen.style.visibility = "visible";
+    pauseScreen.style.display = "grid";
 } );
 
 // 포커스 콜백
 controls.addEventListener( "lock", function() {
-    pauseScreen.style.visibility = "hidden";
+    pauseScreen.style.display = "none";
 } );
 
 

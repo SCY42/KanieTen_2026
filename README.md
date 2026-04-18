@@ -10,6 +10,11 @@
 
 https://x.com/MeTyaYuRusu
 
+### BGM
+
+ゆめにっき OST - バラック集落
+https://yumenikki.fandom.com/wiki/Soundtrack
+
 ### 3D Model
 
 This work is based on "The Mardou museum" (https://sketchfab.com/3d-models/the-mardou-museum-daad27708791473eb3361401906492c0) by OuterspaceSoftware (https://sketchfab.com/OuterspaceSoftware) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
