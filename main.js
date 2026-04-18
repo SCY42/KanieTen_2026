@@ -74,6 +74,7 @@ const movement = {
     right: false,
     up: false,
     down: false,
+    run: 0,
 }
 
 // 조작 키 다운 콜백
@@ -85,6 +86,7 @@ document.addEventListener( 'keydown', (e) => {
       case 'KeyD': movement.right       = true; break;
       case 'Space': movement.up         = true; break;
       case 'ControlLeft': movement.down = true; break;
+      case 'ShiftLeft': movement.run    = 1;    break;
 
       case 'KeyE': zoomIn(); break;
     } requestRender();
@@ -99,6 +101,7 @@ document.addEventListener( 'keyup', (e) => {
       case 'KeyD': movement.right       = false; break;
       case 'Space': movement.up         = false; break;
       case 'ControlLeft': movement.down = false; break;
+      case 'ShiftLeft': movement.run    = 0;     break;
       
       case 'KeyE': zoomOut(); break;
     } requestRender();
@@ -300,7 +303,8 @@ scene.add( dirLight );
 // ╚══════════════════════════════════════════════════════════════════════╝ //
 
 
-const SPEED = 0.5;
+const SPEED = 0.3;
+const SPEED_VARIANCE = 0.3;
 let result;
 const HEIGHT = 6.5;
 const GROUND = -16.6 + HEIGHT;
@@ -312,11 +316,11 @@ let needsRender = true;
 function updateCamera() {
     rayCaster.set( camera.position, down );
     result = rayCaster.intersectObjects( floors );
-    
-    if (movement.forward)  controls.moveForward(SPEED);
-    if (movement.backward) controls.moveForward(-SPEED);
-    if (movement.left)     controls.moveRight(-SPEED);
-    if (movement.right)    controls.moveRight(SPEED);
+
+    if ( movement.forward )  controls.moveForward( SPEED + movement.run * SPEED_VARIANCE );
+    if ( movement.backward ) controls.moveForward( -( SPEED + movement.run * SPEED_VARIANCE ) );
+    if ( movement.left )     controls.moveRight( -( SPEED + movement.run * SPEED_VARIANCE ) );
+    if ( movement.right )    controls.moveRight( SPEED + movement.run * SPEED_VARIANCE );
     
     if ( result[0] == null ) {
         camera.position.y = GROUND;
@@ -324,8 +328,8 @@ function updateCamera() {
         camera.position.y = result[0].point.y + HEIGHT;
     }
 
-    if (movement.up)       camera.position.y += HEIGHT_VARIANCE;
-    if (movement.down)     camera.position.y -= HEIGHT_VARIANCE;
+    if ( movement.up )       camera.position.y += HEIGHT_VARIANCE;
+    if ( movement.down )     camera.position.y -= HEIGHT_VARIANCE;
 }
 
 
