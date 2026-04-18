@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>My first three.js app</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+      body {
+        margin: 0;
+
+        font-family: "Noto Sans JP", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+      }
+      #pauseScreen {
+        background-color: rgba(0, 0, 0, 0.5);
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        pointer-events: none;
+
+        display: grid;
+        grid-template-rows: 3fr 5fr 1fr;
+        grid-template-columns: 1fr, 1fr;
+        place-items: center;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-bZ8UA9Mn.js"></script>
+  </head>
+  <body>
+    <audio id="bgm" src="audio.wav" onloadstart="this.volume=0.1" loop></audio>
+
+    <div id="pauseScreen" style="color: white;">
+      <div style="grid-column: 1 / span 2">
+        <div style="font-size: 6vw; text-align: center;">蟹江展</div>
+        <div style="font-size: 2vw; text-align: center;">2026.04.23</div>
+      </div>
+      <div style="font-size: 2vw;">
+        <div style="font-size: 3vw;">操作方法</div>
+        <pre>
+mouse		見回し
+w a s d		移動
+e		拡大
+m		BGM再生・停止
+shift		走る
+ctrl		しゃがむ
+space		つま先立つ
+esc		ポーズ
+        </pre>
+      </div>
+      <div style="font-size: 2vw;">
+        <div style="font-size: 3vw;">クレジット</div>
+        <pre>
+絵			蟹江 (@MeTyaYuRusu)
+3Dギャラリーモデル	OuterspaceSoftware
+空テクスチャー		Luke.RUSTLTD
+BGM			Kikiyama
+サイト制作		42 (@PseudoCardiac)
+        </pre>
+      </div>
+      <div id="loadingProgress" style="font-size: 4vh; text-align: center; grid-column: 1 / span 2">▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒</div>
+      <img src="click.gif" style="position: absolute; width: 5vw; bottom: 30px; right: 30px;"></img>
+      <img id="bgm_on" src="audio_on.gif" style="visibility: hidden; position: absolute; width: 5vw; top: 30px; left: 30px;"></img>
+      <img id="bgm_off" src="audio_off.gif" style="position: absolute; width: 5vw; top: 30px; left: 30px;"></img>
+    </div>
+  </body>
+</html>
