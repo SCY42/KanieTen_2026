@@ -10,6 +10,7 @@
     <link rel="apple-touch-icon" href="favicon.png"/>
     <style>
       body {
+        background-color: rgba(0, 0, 0, 1);
         margin: 0;
 
         font-family: "Noto Sans JP", sans-serif;
@@ -19,8 +20,8 @@
       }
       #pauseScreen {
         background-color: rgba(0, 0, 0, 0.5);
-        width: 100vw;
-        height: 100vh;
+        width: 100dvw;
+        height: 100dvh;
         position: absolute;
         pointer-events: none;
 
@@ -34,14 +35,14 @@
   <body>
     <audio id="bgm" src="audio.wav" onloadstart="this.volume=0.1" loop></audio>
     <script type="module" src="/main.js"></script>
-
+    
     <div id="pauseScreen" style="color: white;">
-      <div style="grid-column: 1 / span 2">
-        <div style="font-size: 6vw; text-align: center;">蟹江展</div>
-        <div style="font-size: 2vw; text-align: center;">2026.04.23</div>
+      <div style="grid-column: 1 / span 2; grid-row: 1">
+        <div style="font-size: 12vmin; text-align: center;">蟹江展</div>
+        <div style="font-size: 4vmin; text-align: center;">2026.04.23</div>
       </div>
-      <div style="font-size: 2vw;">
-        <div style="font-size: 3vw;">操作方法</div>
+      <div style="font-size: 3.5vmin; grid-column: 1 / span 1; grid-row: 2">
+        <div style="font-size: 5vmin;">操作方法</div>
         <pre>
 mouse		見回し
 w a s d		移動
@@ -53,8 +54,8 @@ space		つま先立つ
 esc		ポーズ
         </pre>
       </div>
-      <div style="font-size: 2vw;">
-        <div style="font-size: 3vw;">クレジット</div>
+      <div style="font-size: 3.5vmin; grid-column: 2 / span 1; grid-row: 2">
+        <div style="font-size: 5vmin;">クレジット</div>
         <pre>
 絵			蟹江 (@MeTyaYuRusu)
 3Dギャラリーモデル	OuterspaceSoftware
@@ -63,10 +64,10 @@ BGM			Kikiyama
 サイト制作		42 (@PseudoCardiac)
         </pre>
       </div>
-      <div id="loadingProgress" style="font-size: 4vh; text-align: center; grid-column: 1 / span 2">▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒</div>
-      <img src="click.gif" style="position: absolute; width: 5vw; bottom: 30px; right: 30px;"></img>
-      <img id="bgm_on" src="audio_on.gif" style="visibility: hidden; position: absolute; width: 5vw; top: 30px; left: 30px;"></img>
-      <img id="bgm_off" src="audio_off.gif" style="position: absolute; width: 5vw; top: 30px; left: 30px;"></img>
+      <div id="loadingProgress" style="font-size: 2vw; text-align: center; grid-column: 1 / span 2; grid-row: 3">▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒</div>
+      <img src="click.gif" style="position: absolute; width: 5vmax; bottom: 30px; right: 30px;"></img>
+      <img id="bgm_on" src="audio_on.gif" style="visibility: hidden; position: absolute; width: 5vmax; top: 30px; left: 30px;"></img>
+      <img id="bgm_off" src="audio_off.gif" style="position: absolute; width: 5vmax; top: 30px; left: 30px;"></img>
     </div>
   </body>
 </html>
