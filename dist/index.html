@@ -20,8 +20,9 @@
       }
       #pauseScreen {
         background-color: rgba(0, 0, 0, 0.5);
-        width: 100dvw;
-        height: 100dvh;
+        color: white;
+        width: 100%;
+        height: 100%;
         position: absolute;
         pointer-events: none;
 
@@ -31,12 +32,12 @@
         place-items: center;
       }
     </style>
+    <script type="module" crossorigin src="/KanieTen_2026/assets/index-CZnHxWrW.js"></script>
   </head>
   <body>
-    <audio id="bgm" src="audio.wav" onloadstart="this.volume=0.1" loop></audio>
-    <!-- <script type="module" src="/main.js"></script> -->
+    <audio id="bgm" src="audio.wav" onloadstart="this.volume=0.1" loop></audio>
     
-    <div id="pauseScreen" style="color: white;">
+    <div id="pauseScreen">
       <div style="grid-column: 1 / span 2; grid-row: 1">
         <div style="font-size: 12vmin; text-align: center;">蟹江展</div>
         <div style="font-size: 4vmin; text-align: center;">2026.04.23</div>

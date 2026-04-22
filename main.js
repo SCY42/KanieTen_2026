@@ -61,6 +61,12 @@ document.addEventListener( "click", () => {
 } );
 
 
+// 캔버스 사이즈 조정
+const canvas = document.getElementsByTagName( "canvas" )[0];
+canvas.style.width = "100%";
+canvas.style.height = "100%";
+
+
 // ╔══════════════════════════════════════════════════════════════════════╗ //
 // ║                                 콜백                                 ║ //
 // ╚══════════════════════════════════════════════════════════════════════╝ //
@@ -135,6 +141,8 @@ const onWindowResize = function () {
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.render( scene, camera );
     requestRender();
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
 }; window.addEventListener( "resize", onWindowResize, false );
 
 // 카메라 시점 조작 콜백
