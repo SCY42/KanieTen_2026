@@ -1,12 +1,27 @@
 import * as THREE from 'three';
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { StaticGeometryGenerator, MeshBVH } from 'three-mesh-bvh';
 
 
 // ╔══════════════════════════════════════════════════════════════════════╗ //
 // ║                                초기화                                ║ //
 // ╚══════════════════════════════════════════════════════════════════════╝ //
+
+
+// 컨트롤 방식 변수
+let isTouchControlled = false;
+
+
+function touchDetected() {
+    isTouchControlled = true;
+}
+
+
+function clickDetected() {
+    isTouchControlled = false;
+}
 
 
 // 장면 초기화
@@ -59,6 +74,14 @@ controls.pointerSpeed = 0.5;
 document.addEventListener( "click", () => {
     controls.lock();
 } );
+
+
+const dummyCube = new THREE.Mesh( new THREE.BoxGeometry(), new THREE.MeshBasicMaterial( 0xFFFFFF ) );
+dummyCube.position.set( -11, -10, 5 );
+scene.add( dummyCube )
+const mobileControls = new OrbitControls( dummyCube, renderer.domElement );
+mobileControls.target = new THREE.Vector3( -11, -10, 5 );
+mobileControls.update();
 
 
 // 캔버스 사이즈 조정
@@ -338,6 +361,10 @@ function updateCamera() {
 
     if ( movement.up )       camera.position.y += HEIGHT_VARIANCE;
     if ( movement.down )     camera.position.y -= HEIGHT_VARIANCE;
+
+    mobileControls.update();
+    console.log( "horizontal:" + mobileControls.getAzimuthalAngle() );
+    console.log( "vertical:  " + mobileControls.getPolarAngle() );
 }
 
 
